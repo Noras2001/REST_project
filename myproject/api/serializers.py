@@ -1,8 +1,6 @@
 # myproject\api\serializers.py
 from rest_framework import serializers
-
 from .models import Book, Category
-
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,9 +10,7 @@ class BookSerializer(serializers.ModelSerializer):
             'title': {'help_text': 'Название книги'},
             'author': {'help_text': 'Автор книги'},
             'published_date': {'help_text': 'Дата публикации (формат YYYY-MM-DD)'},
-            'isbn': {'help_text': 'Уникальный ISBN номер книги'},
-            'page_count': {'help_text': 'Количество страниц'},
-            'cover': {'help_text': 'Ссылка на изображение обложки'},
+            'category': {'help_text': 'Категория книги'},
         }
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,3 +21,10 @@ class CategorySerializer(serializers.ModelSerializer):
             'name': {'help_text': 'Название категории'},
             'description': {'help_text': 'Описание категории (опционально)'},
         }
+
+class CategoryDetailSerializer(serializers.ModelSerializer):
+    books = BookSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = '__all__'

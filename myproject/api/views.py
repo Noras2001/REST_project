@@ -1,11 +1,7 @@
-# myproject\api\views.py
-from rest_framework.generics import ListCreateAPIView
-from drf_spectacular.utils import extend_schema
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Book, Category
-from .serializers import BookSerializer, CategorySerializer
-
-
+from .serializers import BookSerializer, CategorySerializer, CategoryDetailSerializer
 
 @extend_schema(
     summary="Получение списка книг",
@@ -20,10 +16,7 @@ class BookListCreateAPIView(ListCreateAPIView):
 @extend_schema(
     summary="Работа с конкретной книгой",
     description="Позволяет получить информацию о книге, обновить её данные или удалить.",
-    responses={
-        200: BookSerializer,
-        204: None
-    }
+    responses={200: BookSerializer, 204: None}
 )
 class BookDetailAPIView(RetrieveUpdateDestroyAPIView):
     """
@@ -44,11 +37,18 @@ class CategoryListCreateAPIView(ListCreateAPIView):
 @extend_schema(
     summary="Работа с конкретной категорией",
     description="Эндпоинт для получения, обновления и удаления конкретной категории.",
-    responses={
-        200: CategorySerializer,
-        204: None
-    }
+    responses={200: CategorySerializer, 204: None}
 )
 class CategoryDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Детальная категория с книгами",
+        description="Получение категории с вложенными данными (книги, относящиеся к категории)."
+    )
+)
+class CategoryDetailView(RetrieveAPIView):
+    queryset = Category.objects.prefetch_related('books')
+    serializer_class = CategoryDetailSerializer
